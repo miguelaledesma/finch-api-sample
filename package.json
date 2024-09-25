@@ -1,0 +1,10 @@
+{
+  "name": "finch-takehome-project",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run dev --prefix ./frontend\" \"npm run start --prefix ./backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
