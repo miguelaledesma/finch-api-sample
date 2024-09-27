@@ -10,6 +10,8 @@ const App = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [error, setError] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const providers = [
     { id: "gusto", name: "Gusto" },
     { id: "justworks", name: "Justworks" },
@@ -30,12 +32,9 @@ const App = () => {
 
   const handleCreateSandbox = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/create-sandbox",
-        {
-          provider_id: providerId,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/create-sandbox`, {
+        provider_id: providerId,
+      });
       setAccessToken(response.data.access_token);
       setProviderName(response.data.payroll_provider_id);
       setError("");
@@ -46,7 +45,7 @@ const App = () => {
 
   const fetchCompanyInfo = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/company", {
+      const response = await axios.get(`${API_URL}/api/company`, {
         params: { access_token: accessToken },
       });
       setCompanyInfo(response.data);
@@ -58,7 +57,7 @@ const App = () => {
 
   const fetchEmployeeDirectory = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/directory", {
+      const response = await axios.get(`${API_URL}/api/directory`, {
         params: { access_token: accessToken },
       });
       setEmployeeDirectory(response.data.individuals);
@@ -70,13 +69,10 @@ const App = () => {
 
   const fetchEmployeeDetails = async (employeeId) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/employee-details",
-        {
-          individual_id: employeeId,
-          access_token: accessToken,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/employee-details`, {
+        individual_id: employeeId,
+        access_token: accessToken,
+      });
       setSelectedEmployee(response.data);
       setError("");
     } catch (error) {
