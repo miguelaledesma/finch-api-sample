@@ -32,3 +32,7 @@ cd finch-takehome-project
 - You can find `.env` files in both the `frontend` and `backend` folders.
 - The **backend** `.env` file allows you to configure the **PORT** for the server (default is 5000).
 - The **frontend** `.env` file allows you to configure the **URL** of the backend server (default is `http://localhost:5000`).
+
+### 3. Run the application
+
+`npm start`
