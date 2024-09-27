@@ -7,7 +7,8 @@ const App = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
   const [providerName, setProviderName] = useState("");
   const [employeeDirectory, setEmployeeDirectory] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [expandedEmployeeId, setExpandedEmployeeId] = useState(null);
+  const [employeeDetails, setEmployeeDetails] = useState({});
   const [error, setError] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -26,7 +27,8 @@ const App = () => {
     setAccessToken("");
     setCompanyInfo(null);
     setEmployeeDirectory(null);
-    setSelectedEmployee(null);
+    setExpandedEmployeeId(null);
+    setEmployeeDetails({});
     setError("");
   }, [providerId]);
 
@@ -73,10 +75,29 @@ const App = () => {
         individual_id: employeeId,
         access_token: accessToken,
       });
-      setSelectedEmployee(response.data);
-      setError("");
+
+      if (response.data) {
+        setEmployeeDetails((prevDetails) => ({
+          ...prevDetails,
+          [employeeId]: response.data,
+        }));
+        setError("");
+      } else {
+        setError("No employee details found");
+      }
     } catch (error) {
       setError("Failed to fetch employee details");
+    }
+  };
+
+  const toggleAccordion = (employeeId) => {
+    if (expandedEmployeeId === employeeId) {
+      setExpandedEmployeeId(null);
+    } else {
+      setExpandedEmployeeId(employeeId);
+      if (!employeeDetails[employeeId]) {
+        fetchEmployeeDetails(employeeId);
+      }
     }
   };
 
@@ -100,7 +121,6 @@ const App = () => {
 
       {accessToken && (
         <>
-          <h2>Access Token: {accessToken}</h2>
           <h3>Provider: {providerName}</h3>
           <button onClick={fetchCompanyInfo}>Get Company Info</button>
           <button onClick={fetchEmployeeDirectory}>
@@ -123,42 +143,77 @@ const App = () => {
       {employeeDirectory && (
         <div>
           <h2>Employee Directory</h2>
+          <p>Click an Employee to view more details</p>
           {employeeDirectory.map((employee) => (
             <div key={employee.id}>
-              <h3 onClick={() => fetchEmployeeDetails(employee.id)}>
+              <h3
+                onClick={() => toggleAccordion(employee.id)}
+                style={{ cursor: "pointer", color: "white" }}
+              >
                 {employee.first_name} {employee.last_name}
               </h3>
-              <p>
-                Department:{" "}
-                {employee.department?.name || "Department not available"}
-              </p>
-              <p>Manager ID: {employee.manager?.id || "No manager assigned"}</p>
-              <p>Active: {employee.is_active ? "Yes" : "No"}</p>
+
+              {expandedEmployeeId === employee.id &&
+                employeeDetails[employee.id] && (
+                  <div style={{ marginLeft: "20px" }}>
+                    <p>
+                      Title:{" "}
+                      {employeeDetails[employee.id].title || "Not available"}
+                    </p>
+                    <p>
+                      Employment Type:{" "}
+                      {employeeDetails[employee.id].employment?.type ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      Department:{" "}
+                      {employeeDetails[employee.id].department?.name ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      Start Date:{" "}
+                      {employeeDetails[employee.id].start_date ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      End Date:{" "}
+                      {employeeDetails[employee.id].end_date || "Not available"}
+                    </p>
+                    <p>
+                      Location:{" "}
+                      {employeeDetails[employee.id].location?.line1 ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      City:{" "}
+                      {employeeDetails[employee.id].location?.city ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      State:{" "}
+                      {employeeDetails[employee.id].location?.state ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      Postal Code:{" "}
+                      {employeeDetails[employee.id].location?.postal_code ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      Country:{" "}
+                      {employeeDetails[employee.id].location?.country ||
+                        "Not available"}
+                    </p>
+                    <p>
+                      Income:{" "}
+                      {employeeDetails[employee.id].income?.amount ||
+                        "Not available"}{" "}
+                      {employeeDetails[employee.id].income?.currency || "USD"}
+                    </p>
+                  </div>
+                )}
             </div>
           ))}
-        </div>
-      )}
-
-      {selectedEmployee && (
-        <div>
-          <h2>Employee Details</h2>
-          <p>First Name: {selectedEmployee.person.first_name}</p>
-          <p>Last Name: {selectedEmployee.person.last_name}</p>
-          <p>Title: {selectedEmployee.employment.title || "Not available"}</p>
-          <p>
-            Start Date:{" "}
-            {selectedEmployee.employment.start_date || "Not available"}
-          </p>
-          <p>
-            Department:{" "}
-            {selectedEmployee.person.department?.name ||
-              "Department not available"}
-          </p>
-          <p>
-            Location:{" "}
-            {selectedEmployee.employment.location?.line1 ||
-              "Location not available"}
-          </p>
         </div>
       )}
 
