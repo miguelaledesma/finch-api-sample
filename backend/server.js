@@ -36,7 +36,7 @@ app.post("/api/create-sandbox", async (req, res) => {
   }
 });
 
-// Get company info
+// Get company information
 app.get("/api/company", async (req, res) => {
   const { access_token } = req.query;
 
@@ -73,8 +73,6 @@ app.get("/api/directory", async (req, res) => {
     });
   }
 });
-
-// Error handling for unsupported endpoints
 
 app.post("/api/employee-details", async (req, res) => {
   const { individual_id, access_token } = req.body;
