@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import EmployeeAccordion from "./components/EmployeeAccordian";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 const App = () => {
   const [providerId, setProviderId] = useState("");
@@ -7,7 +12,6 @@ const App = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
   const [providerName, setProviderName] = useState("");
   const [employeeDirectory, setEmployeeDirectory] = useState(null);
-  const [expandedEmployeeId, setExpandedEmployeeId] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState({});
   const [error, setError] = useState("");
 
@@ -27,7 +31,6 @@ const App = () => {
     setAccessToken("");
     setCompanyInfo(null);
     setEmployeeDirectory(null);
-    setExpandedEmployeeId(null);
     setEmployeeDetails({});
     setError("");
   }, [providerId]);
@@ -90,38 +93,33 @@ const App = () => {
     }
   };
 
-  const toggleAccordion = (employeeId) => {
-    if (expandedEmployeeId === employeeId) {
-      setExpandedEmployeeId(null);
-    } else {
-      setExpandedEmployeeId(employeeId);
-      if (!employeeDetails[employeeId]) {
-        fetchEmployeeDetails(employeeId);
-      }
-    }
-  };
-
   return (
     <div style={{ padding: "20px" }}>
       <h1>Finch Take Home Assignment</h1>
 
-      <label htmlFor="provider">Provider:</label>
-      <select
-        id="provider"
-        value={providerId}
-        onChange={(e) => setProviderId(e.target.value)}
-      >
-        <option value="">Select a provider</option>
-        {providers.map((provider) => (
-          <option key={provider.id} value={provider.id}>
-            {provider.name}
-          </option>
-        ))}
-      </select>
+      <FormControl fullWidth>
+        <InputLabel id="provider-label">Provider</InputLabel>
+        <Select
+          labelId="provider-label"
+          id="provider"
+          value={providerId}
+          label="Provider"
+          onChange={(e) => setProviderId(e.target.value)}
+        >
+          <MenuItem value="">
+            <em>Select a provider</em>
+          </MenuItem>
+          {providers.map((provider) => (
+            <MenuItem key={provider.id} value={provider.id}>
+              {provider.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       {accessToken && (
         <>
-          <h3>Provider: {providerName}</h3>
+          <h2>Provider: {providerName}</h2>
           <button onClick={fetchCompanyInfo}>Get Company Info</button>
           <button onClick={fetchEmployeeDirectory}>
             Get Employee Directory
@@ -145,74 +143,12 @@ const App = () => {
           <h2>Employee Directory</h2>
           <p>Click an Employee to view more details</p>
           {employeeDirectory.map((employee) => (
-            <div key={employee.id}>
-              <h3
-                onClick={() => toggleAccordion(employee.id)}
-                style={{ cursor: "pointer", color: "white" }}
-              >
-                {employee.first_name} {employee.last_name}
-              </h3>
-
-              {expandedEmployeeId === employee.id &&
-                employeeDetails[employee.id] && (
-                  <div style={{ marginLeft: "20px" }}>
-                    <p>
-                      Title:{" "}
-                      {employeeDetails[employee.id].title || "Not available"}
-                    </p>
-                    <p>
-                      Employment Type:{" "}
-                      {employeeDetails[employee.id].employment?.type ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      Department:{" "}
-                      {employeeDetails[employee.id].department?.name ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      Start Date:{" "}
-                      {employeeDetails[employee.id].start_date ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      End Date:{" "}
-                      {employeeDetails[employee.id].end_date || "Not available"}
-                    </p>
-                    <p>
-                      Location:{" "}
-                      {employeeDetails[employee.id].location?.line1 ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      City:{" "}
-                      {employeeDetails[employee.id].location?.city ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      State:{" "}
-                      {employeeDetails[employee.id].location?.state ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      Postal Code:{" "}
-                      {employeeDetails[employee.id].location?.postal_code ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      Country:{" "}
-                      {employeeDetails[employee.id].location?.country ||
-                        "Not available"}
-                    </p>
-                    <p>
-                      Income:{" "}
-                      {employeeDetails[employee.id].income?.amount ||
-                        "Not available"}{" "}
-                      {employeeDetails[employee.id].income?.currency || "USD"}
-                    </p>
-                  </div>
-                )}
-            </div>
+            <EmployeeAccordion
+              key={employee.id}
+              employee={employee}
+              details={employeeDetails[employee.id]}
+              fetchEmployeeDetails={fetchEmployeeDetails}
+            />
           ))}
         </div>
       )}
