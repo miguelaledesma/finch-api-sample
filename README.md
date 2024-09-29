@@ -18,7 +18,6 @@ This is a full-stack project to interact with the Finch API. The frontend is bui
 
 ```bash
 git clone https://github.com/miguelaledesma/finch-api-sample.git
-cd finch-takehome-project
 ```
 
 ### 2. Install Dependencies
