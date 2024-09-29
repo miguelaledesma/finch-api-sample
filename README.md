@@ -35,3 +35,7 @@ git clone https://github.com/miguelaledesma/finch-api-sample.git
 ### 3. Run the application
 
 `npm start`
+
+### Link to Summary
+
+You find the project summary [here](https://docs.google.com/document/d/1NsRuOaYwkd83s16f4beWLn78tdPxqyn17Stkt-Go5lA/edit?usp=sharing).
