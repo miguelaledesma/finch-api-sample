@@ -1,6 +1,6 @@
 # Finch Take Home Project
 
-This is a full-stack project to interact with the Finch API. The frontend is built using React (with Vite), and the backend is built using Express. The two are run concurrently using the `concurrently` package.
+This is a full-stack project to interact with the Finch API. The frontend is built using React (with Vite), and the backend is built using Express.
 
 ## Project Structure
 
