@@ -4,8 +4,14 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 
-const EmployeeAccordion = ({ employee, details, fetchEmployeeDetails }) => {
+const EmployeeAccordion = ({
+  employee,
+  details,
+  fetchEmployeeDetails,
+  testPaymentEndpoint,
+}) => {
   return (
     <Accordion onChange={() => fetchEmployeeDetails(employee.id)}>
       <AccordionSummary
@@ -25,19 +31,20 @@ const EmployeeAccordion = ({ employee, details, fetchEmployeeDetails }) => {
               Employment Type: {details.employment?.type || "Not available"}
             </p>
             <p>Department: {details.department?.name || "Not available"}</p>
+
             <p>Start Date: {details.start_date || "Not available"}</p>
             <p>End Date: {details.end_date || "Not available"}</p>
+
             <p>Location: {details.location?.line1 || "Not available"}</p>
-            <p>City: {details.location?.city || "Not available"}</p>
-            <p>State: {details.location?.state || "Not available"}</p>
-            <p>
-              Postal Code: {details.location?.postal_code || "Not available"}
-            </p>
-            <p>Country: {details.location?.country || "Not available"}</p>
-            <p>
-              Income: {details.income?.amount || "Not available"}{" "}
-              {details.income?.currency || "USD"}
-            </p>
+
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => testPaymentEndpoint(employee.id)}
+              style={{ marginTop: "10px" }}
+            >
+              Test Payment Endpoint
+            </Button>
           </div>
         ) : (
           <p>Loading details...</p>

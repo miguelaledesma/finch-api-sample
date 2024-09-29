@@ -73,7 +73,7 @@ app.get("/api/directory", async (req, res) => {
     });
   }
 });
-
+// get details of the employee
 app.post("/api/employee-details", async (req, res) => {
   const { individual_id, access_token } = req.body;
 
@@ -95,6 +95,47 @@ app.post("/api/employee-details", async (req, res) => {
       message: "Failed to fetch employee details",
       error: error.message,
     });
+  }
+});
+
+// Try accessing /payment on the sandbox and return 403 Forbidden
+app.get("/api/payment", async (req, res) => {
+  const { access_token, start_date, end_date } = req.query;
+
+  try {
+    await axios.get(`${SANDBOX_URL}employer/payment`, {
+      params: { start_date, end_date },
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    res
+      .status(403)
+      .json({ message: "Access to the /payment endpoint is forbidden." });
+  } catch (error) {
+    res
+      .status(403)
+      .json({ message: "Access to the /payment endpoint is forbidden." });
+  }
+});
+
+// Try accessing /pay-statement on the sandbox and return 403 Forbidden
+app.get("/api/pay-statement", async (req, res) => {
+  const { access_token } = req.query;
+
+  try {
+    await axios.get(`${SANDBOX_URL}employer/pay-statement`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    res
+      .status(403)
+      .json({ message: "Access to the /pay-statement endpoint is forbidden." });
+  } catch (error) {
+    res
+      .status(403)
+      .json({ message: "Access to the /pay-statement endpoint is forbidden." });
   }
 });
 

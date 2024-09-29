@@ -5,6 +5,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { Alert, Button, Typography } from "@mui/material";
 
 const App = () => {
   const [providerId, setProviderId] = useState("");
@@ -14,6 +15,7 @@ const App = () => {
   const [employeeDirectory, setEmployeeDirectory] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState({});
   const [error, setError] = useState("");
+  const [paymentError, setPaymentError] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,6 +24,7 @@ const App = () => {
     { id: "justworks", name: "Justworks" },
     { id: "bamboo_hr", name: "Bamboo HR" },
     { id: "adp_run", name: "ADP Run" },
+    { id: "testFailingProvider", name: "Test Failure" },
   ];
 
   useEffect(() => {
@@ -33,6 +36,7 @@ const App = () => {
     setEmployeeDirectory(null);
     setEmployeeDetails({});
     setError("");
+    setPaymentError("");
   }, [providerId]);
 
   const handleCreateSandbox = async () => {
@@ -56,7 +60,9 @@ const App = () => {
       setCompanyInfo(response.data);
       setError("");
     } catch (error) {
-      setError("Failed to fetch company info");
+      const customMessage =
+        error.response?.data?.message || "Failed to fetch company info";
+      setError(customMessage);
     }
   };
 
@@ -68,7 +74,9 @@ const App = () => {
       setEmployeeDirectory(response.data.individuals);
       setError("");
     } catch (error) {
-      setError("Failed to fetch employee directory");
+      const customMessage =
+        error.response?.data?.message || "Failed to fetch employee directory";
+      setError(customMessage);
     }
   };
 
@@ -89,7 +97,41 @@ const App = () => {
         setError("No employee details found");
       }
     } catch (error) {
-      setError("Failed to fetch employee details");
+      const customMessage =
+        error.response?.data?.message || "Failed to fetch employee details";
+      setError(customMessage);
+    }
+  };
+
+  // Function to test /payment endpoint
+  const testPaymentEndpoint = async (employeeId) => {
+    setPaymentError(""); // Reset any previous error
+    const employee = employeeDetails[employeeId];
+
+    if (!employee || !employee.start_date || !employee.end_date) {
+      setPaymentError("Employee start or end date is not available.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API_URL}/api/payment`, {
+        params: {
+          access_token: accessToken,
+          start_date: employee.start_date,
+          end_date: employee.end_date,
+        },
+      });
+
+      // If the request somehow succeeds (which it shouldn't)
+      if (response.status === 200) {
+        setPaymentError("Payment endpoint request succeeded (unexpected).");
+      }
+    } catch (error) {
+      const customMessage =
+        error.response?.status === 403
+          ? error.response?.data?.message
+          : "Error testing payment endpoint (expected)";
+      setPaymentError(customMessage);
     }
   };
 
@@ -120,23 +162,30 @@ const App = () => {
       {accessToken && (
         <>
           <h2>Provider: {providerName}</h2>
-          <button onClick={fetchCompanyInfo}>Get Company Info</button>
-          <button onClick={fetchEmployeeDirectory}>
+          <Button variant="contained" onClick={fetchCompanyInfo}>
+            Get Company Info
+          </Button>
+          <Button variant="contained" onClick={fetchEmployeeDirectory}>
             Get Employee Directory
-          </button>
+          </Button>
         </>
       )}
 
       {companyInfo && (
         <div>
-          <h2>Company Info</h2>
-          <p>Company ID: {companyInfo.id}</p>
-          <p>Company Name: {companyInfo.legal_name}</p>
-          <p>
-            Location: {companyInfo.locations?.[0]?.state || "Not available"}
-          </p>
+          <h2>Company Information</h2>
+          <Typography>ID: {companyInfo.id}</Typography>
+          <Typography>Legal Name: {companyInfo.legal_name}</Typography>
+          <Typography>
+            Email: {companyInfo.primary_email || "Not available"}
+          </Typography>
+          <Typography>
+            Phone: {companyInfo.primary_phone_number || "Not available"}
+          </Typography>
         </div>
       )}
+
+      {paymentError && <Alert severity="error">{paymentError}</Alert>}
 
       {employeeDirectory && (
         <div>
@@ -148,12 +197,13 @@ const App = () => {
               employee={employee}
               details={employeeDetails[employee.id]}
               fetchEmployeeDetails={fetchEmployeeDetails}
+              testPaymentEndpoint={testPaymentEndpoint}
             />
           ))}
         </div>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <Alert severity="error">{error}</Alert>}
     </div>
   );
 };
