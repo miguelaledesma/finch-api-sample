@@ -9,7 +9,7 @@ This is a full-stack project to interact with the Finch API. The frontend is bui
 
 ## Prerequisites
 
-- Node.js installed on your machine.
+- Node.js installed on your machine. (built with node v19.9.0)
 - npm (Node Package Manager) installed.
 
 ## Getting Started

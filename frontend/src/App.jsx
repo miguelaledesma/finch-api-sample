@@ -5,7 +5,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { Alert, Button, Typography } from "@mui/material";
+import { Alert, Button, Typography, CircularProgress } from "@mui/material";
 
 const App = () => {
   const [providerId, setProviderId] = useState("");
@@ -16,7 +16,7 @@ const App = () => {
   const [employeeDetails, setEmployeeDetails] = useState({});
   const [error, setError] = useState("");
   const [paymentError, setPaymentError] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
 
   const providers = [
@@ -41,6 +41,7 @@ const App = () => {
 
   const handleCreateSandbox = async () => {
     try {
+      setLoading(true);
       const response = await axios.post(`${API_URL}/api/create-sandbox`, {
         provider_id: providerId,
       });
@@ -49,6 +50,8 @@ const App = () => {
       setError("");
     } catch (error) {
       setError("Failed to create sandbox");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,7 +108,7 @@ const App = () => {
 
   // Function to test /payment endpoint
   const testPaymentEndpoint = async (employeeId) => {
-    setPaymentError(""); // Reset any previous error
+    setPaymentError("");
     const employee = employeeDetails[employeeId];
 
     if (!employee || !employee.start_date || !employee.end_date) {
@@ -137,7 +140,7 @@ const App = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Finch Take Home Assignment</h1>
+      <h1>Finch Take Home Challenge</h1>
 
       <FormControl fullWidth>
         <InputLabel id="provider-label">Provider</InputLabel>
@@ -200,6 +203,12 @@ const App = () => {
               testPaymentEndpoint={testPaymentEndpoint}
             />
           ))}
+        </div>
+      )}
+
+      {loading && (
+        <div style={{ marginTop: "20px" }}>
+          <CircularProgress />
         </div>
       )}
 
